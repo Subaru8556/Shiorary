@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+@theme {
+  /* Shiorary ブランドカラー（深緑＝枝折の小枝、生成り＝しおりの紙） */
+  --color-brand-50: #eef5ef;
+  --color-brand-100: #dceadf;
+  --color-brand-200: #bad6c1;
+  --color-brand-300: #8fbb9b;
+  --color-brand-400: #619c74;
+  --color-brand-500: #3f7d56;
+  --color-brand-600: #2a5a40;
+  --color-brand-700: #234c36;
+  --color-brand-800: #1f3a2d;
+  --color-brand-900: #182e23;
+  --color-brand-950: #0f1e17;
+  --color-leaf: #86b46a;
+  --color-paper: #f5f1e6;
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+
+  --font-sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+  --font-serif: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+
+  --animate-fade-in: fade-in 0.15s ease-out;
+  --animate-sheet-up: sheet-up 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  --animate-slide-in-right: slide-in-right 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes sheet-up {
+    from { transform: translateY(24px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes slide-in-right {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+}
+
+/* iPhone のノッチ・ホームバー（セーフエリア）対応ユーティリティ */
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@utility pl-safe {
+  padding-left: env(safe-area-inset-left);
+}
+@utility pr-safe {
+  padding-right: env(safe-area-inset-right);
+}
+
+/* スクロールバーを隠す（横スクロールのチップ列など） */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    background: var(--color-paper);
+  }
+  body {
+    @apply font-sans text-slate-800 antialiased;
+    overscroll-behavior-y: none;
+  }
+  button,
+  [role='button'] {
+    touch-action: manipulation;
+  }
+  /* iOS は 16px 未満の入力欄にフォーカスすると画面を勝手に拡大するため、タッチ端末では 16px に揃える */
+  @media (pointer: coarse) {
+    input:not([type='checkbox']):not([type='radio']):not([type='range']),
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+}

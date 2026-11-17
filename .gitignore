@@ -1,0 +1,19 @@
+# 環境変数・秘密鍵（Cloudflareトークン等の流出防止）
+.env
+.env.*
+
+# 蔵書データ・SQLiteデータベース・生成サムネイル
+data/
+
+# フロントエンドの依存パッケージ・ビルド成果物
+frontend/node_modules/
+frontend/dist/
+
+# Goのローカルビルドバイナリ・OS固有ファイル
+backend/book-server
+backend/*.exe
+.DS_Store
+Thumbs.db
+
+# AI への貼り付け用などのコード一括出力
+all_code.txt

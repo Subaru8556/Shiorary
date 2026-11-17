@@ -1,0 +1,41 @@
+services:
+  # 1. 蔵書管理サーバー本体（外部へはポートを一切晒さない）
+  book-server:
+    build: .
+    container_name: book-server
+    restart: unless-stopped
+    volumes:
+      # Linux環境ではどちらも直接フォルダマウントで高速・安全に動作します
+      - ./data/books:/data/books
+      - ./data/app:/data/app
+    environment:
+      - TZ=Asia/Tokyo
+      - DB_PATH=/data/app/library.db
+      - THUMBNAIL_DIR=/data/app/thumbnails
+      - BOOKS_DIR=/data/books
+      - STATIC_DIR=/app/dist
+      - SESSION_SECRET=${SESSION_SECRET:-change_this_to_a_long_random_secret_string}
+    networks:
+      private_vpn_net:
+        ipv4_address: 172.28.0.10
+
+  # 2. Cloudflare Tunnel エージェント
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: book-server-tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    depends_on:
+      - book-server
+    networks:
+      private_vpn_net:
+        ipv4_address: 172.28.0.2
+
+networks:
+  private_vpn_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24

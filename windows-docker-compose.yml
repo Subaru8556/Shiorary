@@ -1,0 +1,47 @@
+services:
+  # 1. 蔵書管理サーバー本体（外部へはポートを一切晒さない）
+  book-server:
+    build: .
+    container_name: book-server
+    restart: unless-stopped
+    # 注意: ports: は意図的に記述しません（コンテナ内部ネットワーク限定）
+    volumes:
+      # 書籍ファイル置き場
+      # （Web画面からの「元ファイルごと削除」機能を使う場合は :ro を外してください）
+      - ./data/books:/data/books
+      # SQLiteデータベースと生成サムネイルの永続化先
+      - app_data:/data/app
+    environment:
+      - TZ=Asia/Tokyo
+      - DB_PATH=/data/app/library.db
+      - THUMBNAIL_DIR=/data/app/thumbnails
+      - BOOKS_DIR=/data/books
+      - STATIC_DIR=/app/dist
+      - SESSION_SECRET=${SESSION_SECRET:-change_this_to_a_long_random_secret_string}
+    networks:
+      private_net:
+        ipv4_address: 172.28.0.10
+
+  # 2. Cloudflare Tunnel エージェント
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: book-server-tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    depends_on:
+      - book-server
+    networks:
+      private_net:
+        ipv4_address: 172.28.0.2
+
+networks:
+  private_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
+
+volumes:
+  app_data:
